@@ -321,6 +321,8 @@ def ser_q_cmd():
 
     try:
         for loop in range(_QCMD_loopTimes):
+            print("loop: " + str(loop + 1))
+            _log_info("loop: " + str(loop + 1))
             for idx, cmd in enumerate(_CMD_LIST):
                 if _QCMD_cmdIntervalMs > 0:
                     time.sleep(_QCMD_cmdIntervalMs/1000)
