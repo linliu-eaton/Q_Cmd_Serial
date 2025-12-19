@@ -2,6 +2,7 @@ import os
 import configparser
 import logging
 import time
+import re
 
 import serial   # serial
 from ctypes import *
@@ -31,6 +32,8 @@ _LOG_logDir = ''
 _CMD_LIST = []
 _RSP_LIST = []
 _COM_PORT = None
+
+_RSP_REGEX_PREFIX = "regex:"
 
 
 # log config --------------------------
@@ -286,6 +289,19 @@ def _cmd_rsp_check(cmd: list, idx: int, result: str):
         _log_info(str(cmd) + "(idx:" + str(idx) + ")" + "rsp check Failed, rsp config error!")
         return
 
+    # regex response check
+    rsp_src = _RSP_LIST[idx]
+    if rsp_src.startswith(_RSP_REGEX_PREFIX):
+        rsp_patt = rsp_src[len(_RSP_REGEX_PREFIX):]
+        if re.match(rsp_patt, result) is None:
+            print(str(cmd) + "(idx:" + str(idx) + ") " + "rsp REGEX check Failed!")
+            _log_info(str(cmd) + "(idx:" + str(idx) + ") " + "rsp REGEX check Failed!")
+        else:
+            print(str(cmd) + "(idx:" + str(idx) + ") " + "rsp REGEX check Succeed!")
+            _log_info(str(cmd) + "(idx:" + str(idx) + ") " + "rsp REGEX check Succeed!")
+        return
+
+    # non-regex response check
     if _RSP_LIST[idx] != result:
         print(str(cmd) + "(idx:" + str(idx) + ")" + "rsp check Failed!")
         _log_info(str(cmd) + "(idx:" + str(idx) + ")" + "rsp check Failed!")
